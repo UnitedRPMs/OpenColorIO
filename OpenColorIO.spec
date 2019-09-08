@@ -20,6 +20,7 @@ Patch0:         OpenColorIO-setuptools.patch
 # https://github.com/imageworks/OpenColorIO/issues/517
 Patch1:         ocio-1.1.0-yamlcpp060.patch
 Patch2:         ocio-glext_h.patch
+Patch3:		8d48ee8da42de2d878db7b42586db8b3c67f83e1.patch
 
 # Utilities
 BuildRequires:  cmake gcc-c++
@@ -123,6 +124,10 @@ Development libraries and headers for %{name}.
 rm -f ext/lcms*
 rm -f ext/tinyxml*
 rm -f ext/yaml*
+
+sed -i "s/-Werror//g" src/core/CMakeLists.txt
+sed -i "s/-Werror//g" src/pyglue/CMakeLists.txt
+sed -i "s/push(hidden)/push(default)/g" src/core/OCIOYaml.cpp
 
 
 %build
