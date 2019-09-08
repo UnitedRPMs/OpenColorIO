@@ -37,12 +37,14 @@ BuildRequires:  freeglut-devel
 BuildRequires:  glew-devel
 BuildRequires:  python3-devel
 BuildRequires:  zlib-devel
+BuildRequires:  OpenEXR-devel
 
-# WARNING: OpenColorIO and OpenImageIO are cross dependent.
+# WARNING: OpenColorIO and OpenImageIO are cross dependent. 
 # If an ABI incompatible update is done in one, the other also needs to be
 # rebuilt.
-BuildRequires:  OpenImageIO-devel >= 2.0.10
-BuildRequires:  OpenEXR-devel
+# Answer// Sure but not a build dependency using both packages ¿How do you solve the lop?) ...
+# BuildRequires:  OpenImageIO-devel >= 2.0.10
+
 
 #######################
 # Unbundled libraries #
