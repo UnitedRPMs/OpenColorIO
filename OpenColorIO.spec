@@ -213,7 +213,6 @@ find %{buildroot} -name "*.cmake" -exec mv {} %{buildroot}%{_datadir}/cmake/Modu
 %changelog
 * Thu Sep 05 2019 David Va <davidva AT tuta DOT io> - 1.1.1-7
 - Upstream
-- ffmpeg enabled
 
 * Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
