@@ -129,7 +129,6 @@ rm -f ext/yaml*
 rm -rf build && mkdir build && pushd build
 %cmake \
        -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
-       -DENABLE_CCACHE=OFF \
        -DOCIO_BUILD_STATIC=OFF \
        -DOCIO_BUILD_DOCS=%{?docs:ON}%{?!docs:OFF} \
        -DOCIO_BUILD_PYGLUE=OFF \
