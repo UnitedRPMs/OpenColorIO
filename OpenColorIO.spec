@@ -20,7 +20,7 @@ Patch0:         OpenColorIO-setuptools.patch
 # https://github.com/imageworks/OpenColorIO/issues/517
 Patch1:         ocio-1.1.0-yamlcpp060.patch
 Patch2:         ocio-glext_h.patch
-Patch3:		8d48ee8da42de2d878db7b42586db8b3c67f83e1.patch
+Patch3:	8d48ee8da42de2d878db7b42586db8b3c67f83e1.patch
 
 # Utilities
 BuildRequires:  cmake gcc-c++
@@ -51,7 +51,8 @@ BuildRequires:  OpenEXR-devel
 #######################
 BuildRequires:  tinyxml-devel
 BuildRequires:  lcms2-devel
-BuildRequires:  yaml-cpp-devel >= 0.5.0
+#BuildRequires:  yaml-cpp-devel >= 0.5.0
+BuildRequires:	git
 
 %if 0%{?docs}
 # Needed for pdf documentation generation
@@ -125,7 +126,7 @@ Development libraries and headers for %{name}.
 # Remove what bundled libraries
 rm -f ext/lcms*
 rm -f ext/tinyxml*
-rm -f ext/yaml*
+# rm -f ext/yaml*
 
 sed -i "s/-Werror//g" src/core/CMakeLists.txt
 sed -i "s/-Werror//g" src/pyglue/CMakeLists.txt
@@ -133,6 +134,11 @@ sed -i "s/push(hidden)/push(default)/g" src/core/OCIOYaml.cpp
 
 
 %build
+
+# Change shebang in all relevant files in this directory and all subdirectories
+# See `man find` for how the `-exec command {} +` syntax works
+find -type f -exec sed -iE '1s=^#! */usr/bin/\(python\|env python\)[23]\?=#!%{__python3}=' {} +
+
 rm -rf build && mkdir build && pushd build
 %cmake \
        -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
@@ -141,7 +147,7 @@ rm -rf build && mkdir build && pushd build
        -DOCIO_BUILD_PYGLUE=OFF \
        -DOCIO_BUILD_TESTS=%{?tests:ON}%{?!tests:OFF} \
        -DPYTHON=%{__python3} \
-       -DUSE_EXTERNAL_YAML=TRUE \
+       -DUSE_EXTERNAL_YAML=OFF \
        -DUSE_EXTERNAL_TINYXML=TRUE \
        -DUSE_EXTERNAL_LCMS=TRUE \
        -DUSE_EXTERNAL_SETUPTOOLS=TRUE \
