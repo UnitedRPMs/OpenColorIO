@@ -5,7 +5,7 @@
 
 Name:           OpenColorIO
 Version:        1.1.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Enables color transforms and image display across graphics apps
 
 License:        BSD
@@ -219,6 +219,10 @@ find %{buildroot} -name "*.cmake" -exec mv {} %{buildroot}%{_datadir}/cmake/Modu
 
 
 %changelog
+
+* Tue Nov 19 2019 Unitedrpms Project <unitedrpms AT protonmail DOT com> 1.1.1-8
+- Rebuilt 
+
 * Thu Sep 05 2019 David Va <davidva AT tuta DOT io> - 1.1.1-7
 - Upstream
 
