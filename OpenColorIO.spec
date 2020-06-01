@@ -5,7 +5,7 @@
 
 Name:           OpenColorIO
 Version:        1.1.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Enables color transforms and image display across graphics apps
 
 License:        BSD
@@ -25,7 +25,6 @@ Patch3:	8d48ee8da42de2d878db7b42586db8b3c67f83e1.patch
 # Utilities
 BuildRequires:  cmake gcc-c++
 BuildRequires:  help2man
-BuildRequires:  python3
 BuildRequires:  python3-markupsafe
 BuildRequires:  python3-setuptools
 
@@ -35,7 +34,11 @@ BuildRequires:  mesa-libGL-devel mesa-libGLU-devel
 BuildRequires:  libX11-devel libXmu-devel libXi-devel
 BuildRequires:  freeglut-devel
 BuildRequires:  glew-devel
+%if 0%{?fedora} >= 33
+BuildRequires:  python3.9-devel
+%else
 BuildRequires:  python3-devel
+%endif
 BuildRequires:  zlib-devel
 BuildRequires:  OpenEXR-devel
 
@@ -219,6 +222,9 @@ find %{buildroot} -name "*.cmake" -exec mv {} %{buildroot}%{_datadir}/cmake/Modu
 
 
 %changelog
+
+* Sun May 31 2020 Unitedrpms Project <unitedrpms AT protonmail DOT com> 1.1.1-9
+- Rebuilt for python3.9
 
 * Tue Nov 19 2019 Unitedrpms Project <unitedrpms AT protonmail DOT com> 1.1.1-8
 - Rebuilt 
