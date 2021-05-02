@@ -4,23 +4,15 @@
 %endif
 
 Name:           OpenColorIO
-Version:        1.1.1
-Release:        11%{?dist}
+Version:        2.0.0
+Release:        7%{dist}
 Summary:        Enables color transforms and image display across graphics apps
 
 License:        BSD
 URL:            http://opencolorio.org/
 Source0:        https://github.com/imageworks/OpenColorIO/archive/v%{version}/%{name}-%{version}.tar.gz
 
-# Work with system libraries instead of bundled.
-Patch0:         OpenColorIO-setuptools.patch
-# Fix build against yaml-cpp 0.6.0+
-# This patch is fine for our case (building against system yaml-cpp)
-# but probably a bit too simple-minded to upstream as-is. See
-# https://github.com/imageworks/OpenColorIO/issues/517
-Patch1:         ocio-1.1.0-yamlcpp060.patch
-Patch2:         ocio-glext_h.patch
-Patch3:	8d48ee8da42de2d878db7b42586db8b3c67f83e1.patch
+#Patch0:		opencolorio-1.1.0-use-GNUInstallDirs-and-fix-cmake-install-location.patch
 
 # Utilities
 BuildRequires:  cmake gcc-c++
@@ -37,12 +29,18 @@ BuildRequires:  glew-devel
 BuildRequires:  python3-devel
 BuildRequires:  zlib-devel
 BuildRequires:  OpenEXR-devel
+BuildRequires:	ninja-build
+BuildRequires:	expat-devel
+BuildRequires:	yaml-cpp-devel
+BuildRequires:	pystring-devel
+BuildRequires:	pybind11-devel
+#BuildRequires:  python3-openexr
 
 # WARNING: OpenColorIO and OpenImageIO are cross dependent. 
 # If an ABI incompatible update is done in one, the other also needs to be
 # rebuilt.
 # Answer// Sure but not a build dependency using both packages ¿How do you solve the lop?) ...
-# BuildRequires:  OpenImageIO-devel >= 2.0.10
+BuildRequires:  OpenImageIO-devel >= 2.2.13.1
 
 
 #######################
@@ -72,7 +70,13 @@ BuildRequires:  texlive-framed texlive-threeparttable texlive-wrapfig
 # Other
 BuildRequires:  texlive-hyphen-base
 %endif
-
+BuildRequires:	doxygen
+BuildRequires:	python3-sphinx
+BuildRequires:	python3-testresources
+BuildRequires:	python3-recommonmark
+BuildRequires:	python3-sphinx-press-theme
+BuildRequires:	python3-sphinx-tabs
+BuildRequires:	python3-breathe
 
 # The following bundled projects are only used for document generation.
 #BuildRequires:  python-docutils
@@ -122,15 +126,12 @@ Development libraries and headers for %{name}.
 %prep
 %autosetup -p1
 
-# Remove what bundled libraries
-rm -f ext/lcms*
-rm -f ext/tinyxml*
-# rm -f ext/yaml*
-
-sed -i "s/-Werror//g" src/core/CMakeLists.txt
-sed -i "s/-Werror//g" src/pyglue/CMakeLists.txt
-sed -i "s/push(hidden)/push(default)/g" src/core/OCIOYaml.cpp
-
+find -type f -exec sed -i 's/-Werror//g' {} +
+#find -type f -exec sed -i 's/push(hidden)/push(default)/g' {} +
+%ifarch x86_64
+find -type f -exec sed -i 's:LIBRARY DESTINATION lib:LIBRARY DESTINATION lib64:g' {} +
+find -type f -exec sed -i 's:ARCHIVE DESTINATION lib:ARCHIVE DESTINATION lib64:g' {} +
+%endif
 
 %build
 
@@ -138,8 +139,14 @@ sed -i "s/push(hidden)/push(default)/g" src/core/OCIOYaml.cpp
 # See `man find` for how the `-exec command {} +` syntax works
 find -type f -exec sed -iE '1s=^#! */usr/bin/\(python\|env python\)[23]\?=#!%{__python3}=' {} +
 
-rm -rf build && mkdir build && pushd build
-%cmake \
+
+rm -rf build && mkdir build 
+%cmake -B build \
+       -GNinja \
+       -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+       -DCMAKE_INSTALL_LIBDIR=%{_lib} \
+       -DCMAKE_INSTALL_FULL_LIBDIR=%{_lib} \
+       -DLIBRARY_OUTPUT_PATH=%{_lib} \
        -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
        -DOCIO_BUILD_STATIC=OFF \
        -DOCIO_BUILD_DOCS=%{?docs:ON}%{?!docs:OFF} \
@@ -153,25 +160,23 @@ rm -rf build && mkdir build && pushd build
 %ifnarch x86_64
        -DOCIO_USE_SSE=OFF \
 %endif
-       -DOpenGL_GL_PREFERENCE=GLVND \
-       ../
+       -DOpenGL_GL_PREFERENCE=GLVND 
 
-%make_build
+%ninja_build -C build
 
 
 %install
-pushd build
-%make_install
+%ninja_install -C build 
 
 # Generate man pages
-mkdir -p %{buildroot}%{_mandir}/man1
-help2man -N -s 1 %{?fedora:--version-string=%{version}} \
-         -o %{buildroot}%{_mandir}/man1/ociocheck.1 \
-         src/apps/ociocheck/ociocheck
-help2man -N -s 1 %{?fedora:--version-string=%{version}} \
-         -o %{buildroot}%{_mandir}/man1/ociobakelut.1 \
-         src/apps/ociobakelut/ociobakelut
-popd
+#mkdir -p %{buildroot}%{_mandir}/man1
+#help2man -N -s 1 %{?fedora:--version-string=%{version}} \
+#         -o %{buildroot}%{_mandir}/man1/ociocheck.1 \
+#         src/apps/ociocheck/ociocheck
+#help2man -N -s 1 %{?fedora:--version-string=%{version}} \
+#         -o %{buildroot}%{_mandir}/man1/ociobakelut.1 \
+#         src/apps/ociobakelut/ociobakelut
+#popd
 
 %if 0%{?docs}
 # Move installed documentation back so it doesn't conflict with the main package
@@ -180,8 +185,8 @@ mv %{buildroot}%{_docdir}/%{name}/* _tmpdoc/
 %endif
 
 # Fix location of cmake files.
-mkdir -p %{buildroot}%{_datadir}/cmake/Modules
-find %{buildroot} -name "*.cmake" -exec mv {} %{buildroot}%{_datadir}/cmake/Modules/ \;
+#mkdir -p %{buildroot}%{_datadir}/cmake/Modules
+#find %{buildroot} -name "*.cmake" -exec mv {} %{buildroot}%{_datadir}/cmake/Modules/ \;
 
 
 %check
@@ -194,15 +199,14 @@ find %{buildroot} -name "*.cmake" -exec mv {} %{buildroot}%{_datadir}/cmake/Modu
 
 %files
 %license LICENSE
-%doc ChangeLog README.md
+%doc CHANGELOG.md README.md
 %{_libdir}/*.so.*
-%dir %{_datadir}/ocio
-%{_datadir}/ocio/setup_ocio.sh
-#{python3_sitearch}/*.so
+%exclude %{_libdir}/libOpenColorIOoiiohelpers.a
+%exclude %{_libdir}/libOpenColorIOoglapphelpers.a
+%{python3_sitearch}/*.so
 
 %files tools
 %{_bindir}/*
-%{_mandir}/man1/*
 
 %if 0%{?docs}
 %files doc
@@ -210,7 +214,7 @@ find %{buildroot} -name "*.cmake" -exec mv {} %{buildroot}%{_datadir}/cmake/Modu
 %endif
 
 %files devel
-%{_datadir}/cmake/Modules/*
+#%{_datadir}/cmake/Modules/*
 %{_includedir}/OpenColorIO/
 #{_includedir}/PyOpenColorIO/
 %{_libdir}/*.so
@@ -218,6 +222,9 @@ find %{buildroot} -name "*.cmake" -exec mv {} %{buildroot}%{_datadir}/cmake/Modu
 
 
 %changelog
+
+* Wed Apr 28 2021 Unitedrpms Project <unitedrpms AT protonmail DOT com> 2.0.0-7
+- Updated to 2.0.0
 
 * Mon Oct 05 2020 Unitedrpms Project <unitedrpms AT protonmail DOT com> 1.1.1-11
 - Rebuilt
