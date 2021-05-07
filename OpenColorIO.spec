@@ -5,7 +5,7 @@
 
 Name:           OpenColorIO
 Version:        2.0.0
-Release:        7%{dist}
+Release:        8%{dist}
 Summary:        Enables color transforms and image display across graphics apps
 
 License:        BSD
@@ -40,7 +40,7 @@ BuildRequires:	pybind11-devel
 # If an ABI incompatible update is done in one, the other also needs to be
 # rebuilt.
 # Answer// Sure but not a build dependency using both packages ¿How do you solve the lop?) ...
-BuildRequires:  OpenImageIO-devel >= 2.2.13.1
+BuildRequires:  OpenImageIO-devel >= 2.2.14.0
 
 
 #######################
@@ -222,6 +222,9 @@ mv %{buildroot}%{_docdir}/%{name}/* _tmpdoc/
 
 
 %changelog
+
+* Tue May 04 2021 Unitedrpms Project <unitedrpms AT protonmail DOT com> 2.0.0-8
+- Rebuilt for OpenImageIO
 
 * Wed Apr 28 2021 Unitedrpms Project <unitedrpms AT protonmail DOT com> 2.0.0-7
 - Updated to 2.0.0
