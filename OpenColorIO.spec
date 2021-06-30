@@ -1,10 +1,5 @@
-%if ! 0%{?bootstrap}
-%global docs 1
-%global tests 1
-%endif
-
 Name:           OpenColorIO
-Version:        2.0.0
+Version:        2.0.1
 Release:        8%{dist}
 Summary:        Enables color transforms and image display across graphics apps
 
@@ -32,7 +27,11 @@ BuildRequires:  OpenEXR-devel
 BuildRequires:	ninja-build
 BuildRequires:	expat-devel
 BuildRequires:	yaml-cpp-devel
+%if 0%{?fedora} >= 34
 BuildRequires:	pystring-devel
+BuildRequires:	python3-sphinx-tabs
+%endif
+
 BuildRequires:	pybind11-devel
 #BuildRequires:  python3-openexr
 
@@ -40,7 +39,7 @@ BuildRequires:	pybind11-devel
 # If an ABI incompatible update is done in one, the other also needs to be
 # rebuilt.
 # Answer// Sure but not a build dependency using both packages ¿How do you solve the lop?) ...
-BuildRequires:  OpenImageIO-devel >= 2.2.14.0
+BuildRequires:  OpenImageIO-devel >= 2.2.15.1
 
 
 #######################
@@ -75,7 +74,7 @@ BuildRequires:	python3-sphinx
 BuildRequires:	python3-testresources
 BuildRequires:	python3-recommonmark
 BuildRequires:	python3-sphinx-press-theme
-BuildRequires:	python3-sphinx-tabs
+
 BuildRequires:	python3-breathe
 
 # The following bundled projects are only used for document generation.
@@ -147,11 +146,12 @@ rm -rf build && mkdir build
        -DCMAKE_INSTALL_LIBDIR=%{_lib} \
        -DCMAKE_INSTALL_FULL_LIBDIR=%{_lib} \
        -DLIBRARY_OUTPUT_PATH=%{_lib} \
+       -DCMAKE_CXX_STANDARD=14 \
        -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
        -DOCIO_BUILD_STATIC=OFF \
-       -DOCIO_BUILD_DOCS=%{?docs:ON}%{?!docs:OFF} \
+       -DOCIO_BUILD_DOCS=OFF \
        -DOCIO_BUILD_PYGLUE=OFF \
-       -DOCIO_BUILD_TESTS=%{?tests:ON}%{?!tests:OFF} \
+       -DOCIO_BUILD_TESTS=OFF \
        -DPYTHON=%{__python3} \
        -DUSE_EXTERNAL_YAML=OFF \
        -DUSE_EXTERNAL_TINYXML=TRUE \
@@ -204,6 +204,7 @@ mv %{buildroot}%{_docdir}/%{name}/* _tmpdoc/
 %exclude %{_libdir}/libOpenColorIOoiiohelpers.a
 %exclude %{_libdir}/libOpenColorIOoglapphelpers.a
 %{python3_sitearch}/*.so
+%{_datadir}/ocio/setup_ocio.sh
 
 %files tools
 %{_bindir}/*
@@ -222,6 +223,12 @@ mv %{buildroot}%{_docdir}/%{name}/* _tmpdoc/
 
 
 %changelog
+
+* Thu Jun 10 2021 Unitedrpms Project <unitedrpms AT protonmail DOT com> 2.0.1-8
+- Rebuilt for python abi
+
+* Thu Jun 10 2021 Unitedrpms Project <unitedrpms AT protonmail DOT com> 2.0.1-7
+- Updated to 2.0.1
 
 * Tue May 04 2021 Unitedrpms Project <unitedrpms AT protonmail DOT com> 2.0.0-8
 - Rebuilt for OpenImageIO
