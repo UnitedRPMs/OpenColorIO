@@ -1,6 +1,6 @@
 Name:           OpenColorIO
-Version:        2.0.1
-Release:        8%{dist}
+Version:        2.1.0
+Release:        7%{dist}
 Summary:        Enables color transforms and image display across graphics apps
 
 License:        BSD
@@ -76,6 +76,7 @@ BuildRequires:	python3-recommonmark
 BuildRequires:	python3-sphinx-press-theme
 
 BuildRequires:	python3-breathe
+BuildRequires:	libvulkan.so.1
 
 # The following bundled projects are only used for document generation.
 #BuildRequires:  python-docutils
@@ -215,7 +216,7 @@ mv %{buildroot}%{_docdir}/%{name}/* _tmpdoc/
 %endif
 
 %files devel
-#%{_datadir}/cmake/Modules/*
+%{_libdir}/cmake/OpenColorIO/
 %{_includedir}/OpenColorIO/
 #{_includedir}/PyOpenColorIO/
 %{_libdir}/*.so
@@ -223,6 +224,9 @@ mv %{buildroot}%{_docdir}/%{name}/* _tmpdoc/
 
 
 %changelog
+
+* Mon Oct 25 2021 Unitedrpms Project <unitedrpms AT protonmail DOT com> 2.1.0-7
+- Updated to 2.1.0
 
 * Thu Jun 10 2021 Unitedrpms Project <unitedrpms AT protonmail DOT com> 2.0.1-8
 - Rebuilt for python abi
