@@ -1,0 +1,15 @@
+Index: OpenColorIO-2.1.0/src/OpenColorIO/CMakeLists.txt
+===================================================================
+--- OpenColorIO-2.1.0.orig/src/OpenColorIO/CMakeLists.txt
++++ OpenColorIO-2.1.0/src/OpenColorIO/CMakeLists.txt
+@@ -293,7 +293,7 @@ endif()
+ 
+ install(TARGETS OpenColorIO
+ 	EXPORT ${PROJECT_NAME}_EXPORTED_TARGETS
+-	LIBRARY DESTINATION lib
+-	RUNTIME DESTINATION bin
+-	ARCHIVE DESTINATION lib
++    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+ )

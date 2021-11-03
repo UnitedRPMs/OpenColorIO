@@ -7,7 +7,8 @@ License:        BSD
 URL:            http://opencolorio.org/
 Source0:        https://github.com/imageworks/OpenColorIO/archive/v%{version}/%{name}-%{version}.tar.gz
 
-#Patch0:		opencolorio-1.1.0-use-GNUInstallDirs-and-fix-cmake-install-location.patch
+Patch0:		ocio-install.patch
+Patch1:		1488.patch
 
 # Utilities
 BuildRequires:  cmake gcc-c++
@@ -23,7 +24,7 @@ BuildRequires:  freeglut-devel
 BuildRequires:  glew-devel
 BuildRequires:  python3-devel
 BuildRequires:  zlib-devel
-BuildRequires:  OpenEXR-devel
+BuildRequires:  openexr-devel >= 3.1.1
 BuildRequires:	ninja-build
 BuildRequires:	expat-devel
 BuildRequires:	yaml-cpp-devel
@@ -31,7 +32,7 @@ BuildRequires:	yaml-cpp-devel
 BuildRequires:	pystring-devel
 BuildRequires:	python3-sphinx-tabs
 %endif
-
+BuildRequires:  openshadinglanguage-devel >= 1.11.15.0
 BuildRequires:	pybind11-devel
 #BuildRequires:  python3-openexr
 
@@ -39,8 +40,7 @@ BuildRequires:	pybind11-devel
 # If an ABI incompatible update is done in one, the other also needs to be
 # rebuilt.
 # Answer// Sure but not a build dependency using both packages ¿How do you solve the lop?) ...
-BuildRequires:  OpenImageIO-devel >= 2.2.15.1
-
+BuildRequires:  OpenImageIO-devel >= 2.3.8.0
 
 #######################
 # Unbundled libraries #
@@ -77,6 +77,7 @@ BuildRequires:	python3-sphinx-press-theme
 
 BuildRequires:	python3-breathe
 BuildRequires:	libvulkan.so.1
+BuildRequires:	imath-devel
 
 # The following bundled projects are only used for document generation.
 #BuildRequires:  python-docutils
